@@ -19,7 +19,7 @@ class StoryCircleListItem extends Component {
 
         if (handleStoryItemPress) handleStoryItemPress(item);
 
-        this.setState({ isPressed: true });
+        // this.setState({ isPressed: true }); //Function to check as watched.
     };
 
     componentDidUpdate(prevProps, prevState, snapshot) {
