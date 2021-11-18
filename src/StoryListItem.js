@@ -27,6 +27,7 @@ import PremiumContainer from '../../../container/premium.container';
 import CameraRoll from "@react-native-community/cameraroll";
 import RNFetchBlob from 'rn-fetch-blob'
 import Video from 'react-native-video';
+import { conditionalExpression } from '@babel/types';
 
 const { width, height } = Dimensions.get('window');
 
@@ -179,6 +180,8 @@ export const StoryListItem = (props: Props) => {
     }
 
     const onShare = async (story_image) => {
+        setLoad(false)
+        setPressed(true), progress.stopAnimation()
         RNFetchBlob.config({
             fileCache: true,
             appendExt: content[current].media_type == 'IMAGE' ? 'png' : 'mp4'
@@ -187,44 +190,13 @@ export const StoryListItem = (props: Props) => {
             .then(async (res) => {
                 await Share.share({
                     url: 'file://' + res.path(),
-                    message: Platform.OS == 'ios'? '' : story_image,
+                    message: Platform.OS == 'ios' ? '' : story_image,
                     type: content[current].media_type == 'IMAGE' ? 'image/png' : 'video/mp4',
                 })
-                // share.share(shareOptions)
-                    .then((res) => console.log('res:', res))
-                    .catch((err) => console.log('err', err))
+                    // share.share(shareOptions)
+                    .then((res) => { setPressed(false), startAnimation() })
+                    .catch((err) => { setPressed(false), startAnimation() })
             });
-
-
-
-
-
-
-
-
-
-        // // the image is now dowloaded to device's storage
-        // .then(resp => {
-        //     // the image path you can use it directly with Image component
-        //     imagePath = resp.path();
-        //     return resp.readFile("base64");
-        // })
-        // .then(async base64Data => {
-        //     var base64Data = `data:video/mp4;base64,` + base64Data;
-        //     // here's base64 encoded image
-        //     Platform.OS == 'ios' ?
-        //         await Share.share({ url: base64Data}):
-        //         await Share.share({ message: story_image, url: story_image, title: 'xd',
-        //         type: 'image/jpg',
-        //         activityItemSources: [
-        //           {
-        //             linkMetadata: {image: `data:image/jpg;base64,${story_image}`},
-        //           },
-        //         ],})
-
-        //     // remove the file from storage
-        //     return fs.unlink(imagePath);
-        // }).catch( err => console.log(err));
     }
 
     const downloadStory = async (story_image) => {
@@ -233,6 +205,7 @@ export const StoryListItem = (props: Props) => {
     }
 
     const saveToCameraRoll = (REMOTE_IMAGE_PATH) => {
+        setPressed(true), progress.stopAnimation()
         let url = REMOTE_IMAGE_PATH;
         // if (Platform.OS === 'android') {
         // ToastAndroid.show("Image is Saving...", ToastAndroid.SHORT)
@@ -248,8 +221,12 @@ export const StoryListItem = (props: Props) => {
                     .then((res) => {
                         console.log("save", res)
                         alert('Success', 'Photo added to camera roll!')
+                        setPressed(false);
+                        startAnimation();
                     }).catch((error) => {
                         alert("Ops! Operation Failed")
+                        setPressed(false)
+                        startAnimation();
                         console.log(error)
                     })
             })
@@ -290,29 +267,30 @@ export const StoryListItem = (props: Props) => {
                     backgroundColor: 'black'
                 }}
             >
-                <View style={styles.backgroundContainer}>
-                    {verifyMedia(content[current]) == true ?
-                        <Image onLoadEnd={() => start()}
-                            source={{ uri: content[current].image }}
-                            style={styles.image}
-                        />
-                        :
-                        <Video onReadyForDisplay={() => start()}
-                            source={{ uri: content[current].image }}   // Can be a URL or a local file.
-                            ref={(ref) => {
-                                this.player = ref
-                            }}                                      // Store reference
-                            onBuffer={this.onBuffer}                // Callback when remote video is buffering
-                            onError={this.videoError}               // Callback when video cannot be loaded
-                            paused={pressed}
-                            resizeMode={"contain"}
-                            style={styles.backgroundVideo} />
-                    }
-
-                    {load && <View style={styles.spinnerContainer}>
-                        <ActivityIndicator size="large" color={'white'} />
-                    </View>}
-                </View>
+                {props.index == props.currentPage ?
+                    <View style={styles.backgroundContainer}>
+                        {verifyMedia(content[current]) == true ?
+                            <Image onLoadEnd={() => { props.duration = 5000, start() }}
+                                source={{ uri: content[current].image }}
+                                style={styles.image}
+                            />
+                            :
+                            <Video onLoad={(data) => { props.duration = data.duration * 1000, console.log(content, 'Hasta aqui', data.duration) }} onReadyForDisplay={() => start()}
+                                source={{ uri: content[current].image }}   // Can be a URL or a local file.
+                                ref={(ref) => {
+                                    this.player = ref
+                                }}                                      // Store reference
+                                onBuffer={this.onBuffer}                // Callback when remote video is buffering
+                                onError={this.videoError}               // Callback when video cannot be loaded
+                                paused={pressed}
+                                resizeMode={"contain"}
+                                style={styles.backgroundVideo} />
+                        }
+                        {load && <View style={styles.spinnerContainer}>
+                            <ActivityIndicator size="large" color={'white'} />
+                        </View>}
+                    </View> : null
+                }
                 <View style={{ flexDirection: 'column', flex: 1, }}>
                     <View style={styles.animationBarContainer}>
                         {content.map((index, key) => {
