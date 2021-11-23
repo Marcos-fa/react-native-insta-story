@@ -21,7 +21,7 @@ import { isNullOrWhitespace } from "./helpers/ValidationHelpers";
 import GestureRecognizer from 'react-native-swipe-gestures';
 import Download from '../../../images/download.svg'
 import ShareSvg from '../../../images/share.svg'
-import Eclipse from '../../../images/Eclipse.svg'
+import Eclipse from '../../../images/Eclipse2.svg'
 import { MainContext } from '../../../context/main.context';
 import colors from '../../../styles/colors';
 import PremiumContainer from '../../../container/premium.container';
