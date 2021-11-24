@@ -12,7 +12,7 @@ import {
     Platform,
     Share,
     Linking,
-    ToastAndroid
+    Easing
 } from "react-native";
 import { initialWindowSafeAreaInsets } from "react-native-safe-area-context";
 import type { IUserStoryItem } from "./interfaces/IUserStory";
@@ -21,6 +21,7 @@ import { isNullOrWhitespace } from "./helpers/ValidationHelpers";
 import GestureRecognizer from 'react-native-swipe-gestures';
 import Download from '../../../images/download.svg'
 import ShareSvg from '../../../images/share.svg'
+import Eclipse from '../../../images/Eclipse2.svg'
 import { MainContext } from '../../../context/main.context';
 import colors from '../../../styles/colors';
 import PremiumContainer from '../../../container/premium.container';
@@ -49,7 +50,7 @@ export const StoryListItem = (props: Props) => {
     const stories = props.stories;
     const { isPremium } = useContext(MainContext);
     const [premiumVisible, setPremiumVisible] = useState(false);
-
+    const [downShare, setDownShare] = useState(0)
     const [load, setLoad] = useState(true);
     const [pressed, setPressed] = useState(false);
     const [content, setContent] = useState(
@@ -65,6 +66,26 @@ export const StoryListItem = (props: Props) => {
     const [current, setCurrent] = useState(0);
 
     const progress = useRef(new Animated.Value(0)).current;
+
+    spinValue = new Animated.Value(0);
+    // First set up animation 
+    Animated.loop(
+        Animated.timing(
+            this.spinValue,
+            {
+                toValue: 1,
+                duration: 3000,
+                easing: Easing.linear, // Easing is an additional import from react-native
+                useNativeDriver: true  // To make use of native driver for performance
+            }
+        )
+    ).start()
+
+    // Next, interpolate beginning and end values (in this case 0 and 1)
+    const spin = this.spinValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['0deg', '360deg']
+    })
 
     useEffect(() => {
         setCurrent(0);
@@ -180,6 +201,7 @@ export const StoryListItem = (props: Props) => {
     }
 
     const onShare = async (story_image) => {
+        setDownShare(2)
         setLoad(false)
         setPressed(true), progress.stopAnimation()
         RNFetchBlob.config({
@@ -196,15 +218,12 @@ export const StoryListItem = (props: Props) => {
                     // share.share(shareOptions)
                     .then((res) => { setPressed(false), startAnimation() })
                     .catch((err) => { setPressed(false), startAnimation() })
+                setDownShare(0)
             });
     }
 
-    const downloadStory = async (story_image) => {
-        console.log(story_image)
-        await Linking.openURL(story_image);
-    }
-
     const saveToCameraRoll = (REMOTE_IMAGE_PATH) => {
+        setDownShare(1)
         setPressed(true), progress.stopAnimation()
         let url = REMOTE_IMAGE_PATH;
         // if (Platform.OS === 'android') {
@@ -216,17 +235,17 @@ export const StoryListItem = (props: Props) => {
             })
             .fetch('GET', url)
             .then((res) => {
-                console.log()
                 CameraRoll.save(res.path())
                     .then((res) => {
-                        console.log("save", res)
                         alert('Success', 'Photo added to camera roll!')
                         setPressed(false);
                         startAnimation();
+                        setDownShare(0)
                     }).catch((error) => {
                         alert("Ops! Operation Failed")
                         setPressed(false)
                         startAnimation();
+                        setDownShare(0)
                         console.log(error)
                     })
             })
@@ -259,8 +278,8 @@ export const StoryListItem = (props: Props) => {
                 <PremiumContainer premiumVisible={premiumVisible} setPremiumVisible={setPremiumVisible} continueStory={continueStory} />
             </View>
             <GestureRecognizer
-                onSwipeUp={(state) => onSwipeUp(state)}
-                onSwipeDown={(state) => onSwipeDown(state)}
+                onSwipeUp={(state) => downShare > 0 ? onSwipeUp(state) : console.log('is downloading or sharing')}
+                onSwipeDown={(state) => downShare > 0 ? onSwipeDown(state) : console.log('is downloading or sharing')}
                 config={config}
                 style={{
                     flex: 1,
@@ -275,7 +294,7 @@ export const StoryListItem = (props: Props) => {
                                 style={styles.image}
                             />
                             :
-                            <Video onLoad={(data) => { props.duration = data.duration * 1000, console.log(content, 'Hasta aqui', data.duration) }} onReadyForDisplay={() => start()}
+                            <Video onLoad={(data) => { props.duration = data.duration * 1000 }} onReadyForDisplay={() => start()}
                                 source={{ uri: content[current].image }}   // Can be a URL or a local file.
                                 ref={(ref) => {
                                     this.player = ref
@@ -284,6 +303,7 @@ export const StoryListItem = (props: Props) => {
                                 onError={this.videoError}               // Callback when video cannot be loaded
                                 paused={pressed}
                                 resizeMode={"contain"}
+                                muted={true}
                                 style={styles.backgroundVideo} />
                         }
                         {load && <View style={styles.spinnerContainer}>
@@ -316,7 +336,7 @@ export const StoryListItem = (props: Props) => {
                                 <Text style={styles.avatarText}>{props.profileName}</Text>
                             </View>
                             <View style={styles.storyOptions} >
-                                <TouchableOpacity onPress={() => !isPremium ? setPremiumVisible(true) : saveToCameraRoll(content[current].image)} style={{ marginRight: 20, alignItems: 'center' }}
+                                <TouchableOpacity disabled={downShare > 0} onPress={() => !isPremium ? setPremiumVisible(true) : saveToCameraRoll(content[current].image)} style={[styles.downloadSvg, { opacity: downShare > 0 ? 0.5 : 1 }]}
                                     onPressIn={() => progress.stopAnimation()}
                                     onLongPress={() => setPressed(true)}
                                 >
@@ -327,11 +347,18 @@ export const StoryListItem = (props: Props) => {
                                         </View>
                                         : null}
                                 </TouchableOpacity>
-                                <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => !isPremium ?
+                                <TouchableOpacity disabled={downShare > 0} style={[styles.sharingSvg, { opacity: downShare > 0 ? 0.5 : 1 }]} onPress={() => !isPremium ?
                                     [setPremiumVisible(true), progress.stopAnimation(), setPressed(true)
                                     ] : onShare(content[current].image)
                                 }
                                 >
+                                    {downShare > 0 ?
+                                        <Animated.View style={{ transform: [{ rotate: spin }], position: 'absolute', bottom: -17, right: downShare == 1 ? 22 : -20 }}>
+                                            <Eclipse width={55} height={55} />
+                                        </Animated.View>
+                                        :
+                                        null
+                                    }
                                     <ShareSvg />
                                     {!isPremium ?
                                         <View style={{ backgroundColor: colors.vipBtn, paddingHorizontal: 7, marginTop: 5, borderRadius: 20 }} >
@@ -356,6 +383,7 @@ export const StoryListItem = (props: Props) => {
                     </View>
                     <View style={styles.pressContainer}>
                         <TouchableWithoutFeedback
+                            disabled={downShare > 0}
                             onPressIn={() => progress.stopAnimation()}
                             onLongPress={() => setPressed(true)}
                             onPressOut={() => {
@@ -370,7 +398,9 @@ export const StoryListItem = (props: Props) => {
                         >
                             <View style={{ flex: 1 }} />
                         </TouchableWithoutFeedback>
-                        <TouchableWithoutFeedback onPressIn={() => progress.stopAnimation()}
+                        <TouchableWithoutFeedback
+                            disabled={downShare > 0}
+                            onPressIn={() => progress.stopAnimation()}
                             onLongPress={() => setPressed(true)}
                             onPressOut={() => {
                                 setPressed(false);
@@ -511,6 +541,13 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         lineHeight: 11,
         letterSpacing: 0,
+    },
+    downloadSvg: {
+        marginRight: 20,
+        alignItems: 'center'
+    },
+    sharingSvg: {
+        alignItems: 'center',
     },
     backgroundVideo: {
         position: 'absolute',
