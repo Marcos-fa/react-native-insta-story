@@ -86,8 +86,8 @@ export const Story = (props: Props) => {
     const renderStoryList = () => selectedData.map((x, i) => {
         return (<StoryListItem duration={duration * 1000}
                                key={i}
-                               profileName={x.user_name}
-                               profileImage={x.user_image}
+                               profileName={x.full_name}
+                               profileImage={x.profile_pic_url}
                                stories={x.stories}
                                currentPage={currentPage}
                                onFinish={onStoryFinish}
