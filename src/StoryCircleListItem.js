@@ -62,7 +62,7 @@ class StoryCircleListItem extends Component {
                             borderWidth: 3,
                             borderColor: '#121212'
                         }}
-                        source={{ uri: item.user_image }}
+                        source={{ uri: item.profile_pic_url }}
                         defaultSource={Platform.OS === 'ios' ? DEFAULT_AVATAR : null}
                     />
                 </TouchableOpacity>
