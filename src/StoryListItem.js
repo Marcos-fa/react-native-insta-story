@@ -12,6 +12,7 @@ import {
     Platform,
     Share,
     Linking,
+    ToastAndroid,
     Easing
 } from "react-native";
 import { initialWindowSafeAreaInsets } from "react-native-safe-area-context";
@@ -67,14 +68,14 @@ export const StoryListItem = (props: Props) => {
 
     const progress = useRef(new Animated.Value(0)).current;
 
-    spinValue = new Animated.Value(0);
+    let spinValue = new Animated.Value(0);
     // First set up animation 
     Animated.loop(
         Animated.timing(
-            this.spinValue,
+            spinValue,
             {
                 toValue: 1,
-                duration: 3000,
+                duration: 1000,
                 easing: Easing.linear, // Easing is an additional import from react-native
                 useNativeDriver: true  // To make use of native driver for performance
             }
@@ -82,7 +83,7 @@ export const StoryListItem = (props: Props) => {
     ).start()
 
     // Next, interpolate beginning and end values (in this case 0 and 1)
-    const spin = this.spinValue.interpolate({
+    const spin = spinValue.interpolate({
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg']
     })
@@ -206,19 +207,19 @@ export const StoryListItem = (props: Props) => {
         setPressed(true), progress.stopAnimation()
         RNFetchBlob.config({
             fileCache: true,
-            appendExt: content[current].media_type == 'IMAGE' ? 'png' : 'mp4'
+            appendExt: content[current].media_type == 'IMAGE' || content[current].media_type === "IMAGEN" ? 'png' : 'mp4'
         })
             .fetch("GET", story_image, {})
             .then(async (res) => {
                 await Share.share({
                     url: 'file://' + res.path(),
                     message: Platform.OS == 'ios' ? '' : story_image,
-                    type: content[current].media_type == 'IMAGE' ? 'image/png' : 'video/mp4',
+                    type: content[current].media_type == 'IMAGE' || content[current].media_type === "IMAGEN" ? 'image/png' : 'video/mp4',
                 })
                     // share.share(shareOptions)
                     .then((res) => { setPressed(false), startAnimation() })
                     .catch((err) => { setPressed(false), startAnimation() })
-                setDownShare(0)
+                // setDownShare(0)
             });
     }
 
@@ -231,7 +232,7 @@ export const StoryListItem = (props: Props) => {
         RNFetchBlob
             .config({
                 fileCache: true,
-                appendExt: content[current].media_type == 'IMAGE' ? 'png' : 'mp4'
+                appendExt: content[current].media_type === 'IMAGE' || content[current].media_type === "IMAGEN" ? 'png' : 'mp4'
             })
             .fetch('GET', url)
             .then((res) => {
@@ -303,7 +304,6 @@ export const StoryListItem = (props: Props) => {
                                 onError={this.videoError}               // Callback when video cannot be loaded
                                 paused={pressed}
                                 resizeMode={"contain"}
-                                muted={true}
                                 style={styles.backgroundVideo} />
                         }
                         {load && <View style={styles.spinnerContainer}>
