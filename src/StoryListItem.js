@@ -13,6 +13,8 @@ import {
     Share,
     Linking,
     ToastAndroid,
+    PermissionsAndroid,
+    android,
     Easing
 } from "react-native";
 import { initialWindowSafeAreaInsets } from "react-native-safe-area-context";
@@ -219,41 +221,63 @@ export const StoryListItem = (props: Props) => {
                     // share.share(shareOptions)
                     .then((res) => { setPressed(false), startAnimation() })
                     .catch((err) => { setPressed(false), startAnimation() })
-                // setDownShare(0)
+                setDownShare(0)
             });
     }
 
-    const saveToCameraRoll = (REMOTE_IMAGE_PATH) => {
+    const saveToCameraRoll = async (REMOTE_IMAGE_PATH) => {
         setDownShare(1)
         setPressed(true), progress.stopAnimation()
+        try {
+            if (Platform.OS === 'android') {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                );
+                if (granted == 'granted') {
+                    saveStory(REMOTE_IMAGE_PATH)
+                } else {
+                    alert("Storage not permited")
+                    setPressed(false);
+                    startAnimation();
+                    setDownShare(0)
+                }
+            } else { saveStory(REMOTE_IMAGE_PATH) }
+        } catch (error) {
+            console.log(error.message)
+            setPressed(false);
+            startAnimation();
+            setDownShare(0)
+        }
+    }
+
+    const saveStory = async (REMOTE_IMAGE_PATH) => {
+        console.log('SIMON SI LLEGA XDXDXDXD')
         let url = REMOTE_IMAGE_PATH;
-        // if (Platform.OS === 'android') {
-        // ToastAndroid.show("Image is Saving...", ToastAndroid.SHORT)
-        RNFetchBlob
-            .config({
-                fileCache: true,
-                appendExt: content[current].media_type === 'IMAGE' || content[current].media_type === "IMAGEN" ? 'png' : 'mp4'
-            })
-            .fetch('GET', url)
-            .then((res) => {
-                CameraRoll.save(res.path())
-                    .then((res) => {
-                        alert('Success', 'Photo added to camera roll!')
-                        setPressed(false);
-                        startAnimation();
-                        setDownShare(0)
-                    }).catch((error) => {
-                        alert("Ops! Operation Failed")
-                        setPressed(false)
-                        startAnimation();
-                        setDownShare(0)
-                        console.log(error)
-                    })
-            })
-        // } else {
-        //     CameraRoll.save(url, {type: 'Video'})
-        //         .then(alert('Success', 'Photo added to camera roll!'))
-        // }
+        try {
+            RNFetchBlob
+                .config({
+                    fileCache: true,
+                    appendExt: content[current].media_type === 'IMAGE' || content[current].media_type === "IMAGEN" ? 'png' : 'mp4'
+                })
+                .fetch('GET', url)
+                .then((res) => {
+                    CameraRoll.save(res.path())
+                        .then((res) => {
+                            alert('Success', 'Photo added to camera roll!')
+                            setPressed(false);
+                            startAnimation();
+                            setDownShare(0)
+                        }).catch((error) => {
+                            alert("Ops! Operation Failed")
+                            setPressed(false)
+                            startAnimation();
+                            setDownShare(0)
+                            console.log(error)
+                        })
+                })
+        } catch (error) {
+            console.log(error.message)
+        }
     }
 
     const verifyMedia = (currentStory) => {
@@ -276,7 +300,7 @@ export const StoryListItem = (props: Props) => {
     return (
         <React.Fragment>
             <View style={{ position: 'absolute' }}>
-                <PremiumContainer premiumVisible={premiumVisible} setPremiumVisible={setPremiumVisible} continueStory={continueStory} />
+                <PremiumContainer premiumVisible={premiumVisible} setPremiumVisible={setPremiumVisible} />
             </View>
             <GestureRecognizer
                 onSwipeUp={(state) => downShare > 0 ? onSwipeUp(state) : console.log('is downloading or sharing')}
