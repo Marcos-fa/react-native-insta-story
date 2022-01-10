@@ -303,8 +303,8 @@ export const StoryListItem = (props: Props) => {
                 <PremiumContainer premiumVisible={premiumVisible} setPremiumVisible={setPremiumVisible} />
             </View>
             <GestureRecognizer
-                onSwipeUp={(state) => downShare > 0 ? onSwipeUp(state) : console.log('is downloading or sharing')}
-                onSwipeDown={(state) => downShare > 0 ? onSwipeDown(state) : console.log('is downloading or sharing')}
+                onSwipeUp={(state) => downShare > 0 ? console.log('is downloading or sharing: ', downShare) : onSwipeUp(state)}
+                onSwipeDown={(state) => downShare > 0 ? console.log('is downloading or sharing: ', downShare) : onSwipeDown(state)}
                 config={config}
                 style={{
                     flex: 1,
