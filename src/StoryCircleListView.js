@@ -26,7 +26,7 @@ class StoryCircleListView extends Component {
         return (
             <View>
                 <FlatList
-                    onEndReached={()=> data.length == limit? getMoreStories() : console.log('all stories')}
+                    onEndReached={()=> data.length == limit? getMoreStories() : console.log('all stories showed')}
                     extraData={data}
                     keyExtractor={(item, index) => index.toString()}
                     progressViewOffset={9}
