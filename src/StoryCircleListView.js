@@ -7,19 +7,7 @@ class StoryCircleListView extends Component {
     constructor(props) {
         super(props);
         this.state = {};
-        // this.onEndReachedCalledDuringMomentum = true;
     }
-    
-    // onEndReached = ({ distanceFromEnd }) => {
-    //     if(!this.onEndReachedCalledDuringMomentum){
-    //         console.log('llego al final');
-    //         increaseLimit()
-    //         this.onEndReachedCalledDuringMomentum = true;
-    //     }else{
-    //         console.log('nose xd');
-    //     }
-    // }
-
 
     render() {
         const {
@@ -29,20 +17,16 @@ class StoryCircleListView extends Component {
             pressedBorderColor,
             avatarSize
         } = this.props;
+        let limit = 10;
+
+        const getMoreStories = () => {
+            limit = increaseLimit() //increase limit and return the new limit
+        }
 
         return (
             <View>
                 <FlatList
-
-                    onEndReached={()=> data.length >= 10? increaseLimit() : console.log('nel')}
-
-
-
-                    // onEndReached={this.onEndReached.bind(this)}
-                    // onEndReachedThreshold={0.5}
-                    // onMomentumScrollBegin={() => { this.onEndReachedCalledDuringMomentum = false; }}
-
-
+                    onEndReached={()=> data.length == limit? getMoreStories() : console.log('all stories')}
                     extraData={data}
                     keyExtractor={(item, index) => index.toString()}
                     progressViewOffset={9}
