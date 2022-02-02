@@ -98,7 +98,6 @@ export const StoryListItem = (props: Props) => {
                 x.finish = 0;
             })
             setContent(data)
-            start();
         }
     }, [props.currentPage]);
 
