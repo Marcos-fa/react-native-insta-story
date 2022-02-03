@@ -299,7 +299,7 @@ export const StoryListItem = (props: Props) => {
     return (
         <React.Fragment>
             <View style={{ position: 'absolute' }}>
-                <PremiumContainer premiumVisible={premiumVisible} setPremiumVisible={setPremiumVisible} />
+                <PremiumContainer premiumVisible={premiumVisible} setPremiumVisible={setPremiumVisible} continueStory={continueStory} />
             </View>
             <GestureRecognizer
                 onSwipeUp={(state) => downShare > 0 ? console.log('is downloading or sharing: ', downShare) : onSwipeUp(state)}
