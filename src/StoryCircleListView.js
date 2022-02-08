@@ -1,7 +1,7 @@
 import React, {Component, useEffect} from "react";
 import {View, FlatList} from "react-native";
 import StoryCircleListItem from "./StoryCircleListItem";
-import {increaseLimit} from '../../../src/api/stories'
+import {getLimit, increaseLimit} from '../../../src/api/stories';
 
 class StoryCircleListView extends Component {
     constructor(props) {
@@ -17,16 +17,11 @@ class StoryCircleListView extends Component {
             pressedBorderColor,
             avatarSize
         } = this.props;
-        let limit = 10;
-
-        const getMoreStories = () => {
-            limit = increaseLimit() //increase limit and return the new limit
-        }
 
         return (
             <View>
                 <FlatList
-                    onEndReached={()=> data.length == limit? getMoreStories() : console.log('all stories showed')}
+                    onEndReached={()=> data.length == getLimit() ? increaseLimit() : null}
                     extraData={data}
                     keyExtractor={(item, index) => index.toString()}
                     progressViewOffset={9}
