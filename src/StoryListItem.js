@@ -358,6 +358,7 @@ export const StoryListItem = (props: Props) => {
                                 />
                                 <Text style={styles.avatarText}>{props.profileName}</Text>
                             </View>
+                            {/*
                             <View style={styles.storyOptions} >
                                 <TouchableOpacity disabled={downShare > 0} onPress={() => !isPremium ? setPremiumVisible(true) : saveToCameraRoll(content[current].image)} style={[styles.downloadSvg, { opacity: downShare > 0 ? 0.5 : 1 }]}
                                     onPressIn={() => progress.stopAnimation()}
@@ -390,6 +391,7 @@ export const StoryListItem = (props: Props) => {
                                         : null}
                                 </TouchableOpacity>
                             </View>
+                            */}
                             {/* <TouchableOpacity onPress={() => {
                             if (props.onClosePress) {
                                 props.onClosePress();
