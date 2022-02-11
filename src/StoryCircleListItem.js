@@ -75,7 +75,7 @@ class StoryCircleListItem extends Component {
                         source={{ uri: item.profile_pic_url }}
                         defaultSource={Platform.OS === 'ios' ? DEFAULT_AVATAR : null}
                     /> */}
-          {!this.state.isImgLoaded && (
+          {!this.state.imageLoaded && (
             <FastImage
               style={{
                 height: avatarSize ?? 60,
