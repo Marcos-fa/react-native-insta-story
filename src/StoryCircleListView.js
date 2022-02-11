@@ -26,7 +26,6 @@ class StoryCircleListView extends Component {
                     this.setState({catchedProfiles: this.state.catchedProfiles.concat(username)})
                 }
             })
-            console.log("STARTS_HOHO", JSON.stringify(this.props.data), 'WOWOWOWOOWOWO');
         }
     }
 
