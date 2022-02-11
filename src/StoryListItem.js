@@ -17,6 +17,7 @@ import {
     android,
     Easing
 } from "react-native";
+import FastImage from "react-native-fast-image";
 import { initialWindowSafeAreaInsets } from "react-native-safe-area-context";
 import type { IUserStoryItem } from "./interfaces/IUserStory";
 import { usePrevious } from "./helpers/StateHelpers";
@@ -313,7 +314,7 @@ export const StoryListItem = (props: Props) => {
                 {props.index == props.currentPage ?
                     <View style={styles.backgroundContainer}>
                         {verifyMedia(content[current]) == true ?
-                            <Image onLoadEnd={() => { props.duration = 5000, start() }}
+                            <FastImage onLoadEnd={() => { props.duration = 5000, start() }}
                                 source={{ uri: content[current].image }}
                                 style={styles.image}
                             />
@@ -353,7 +354,7 @@ export const StoryListItem = (props: Props) => {
                     <View style={styles.userSection}>
                         <View style={styles.userContainer}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                <Image style={styles.avatarImage}
+                                <FastImage style={styles.avatarImage}
                                     source={{ uri: props.profileImage }}
                                 />
                                 <Text style={styles.avatarText}>{props.profileName}</Text>
