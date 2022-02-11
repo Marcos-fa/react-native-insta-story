@@ -7,6 +7,7 @@ import {isNullOrWhitespace} from "./helpers/ValidationHelpers";
 import type {IUserStory} from "./interfaces/IUserStory";
 import AndroidCubeEffect from "./AndroidCubeEffect";
 import CubeNavigationHorizontal from "./CubeNavigationHorizontal";
+import colors from "../../../styles/colors";
 
 type Props = {
     data: IUserStory[],
@@ -134,9 +135,13 @@ export const Story = (props: Props) => {
     return (
         <Fragment>
             <StatusBar 
-                animated={true} 
-                hidden={isModalOpen} 
-                barStyle="light-content" />
+               animated={true}
+               translucent={true}
+               hidden={Platform.OS == 'ios' && isModalOpen? true : false}
+               backgroundColor={colors.backGroundColor}
+               barStyle={'light-content'}
+               showHideTransition={true}
+            />
             <View style={style}>
                 <StoryCircleListView
                     handleStoryItemPress={_handleStoryItemPress}
