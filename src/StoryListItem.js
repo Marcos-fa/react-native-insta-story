@@ -315,8 +315,9 @@ export const StoryListItem = (props: Props) => {
                     <View style={styles.backgroundContainer}>
                         {verifyMedia(content[current]) == true ?
                             <FastImage onLoadEnd={() => { props.duration = 5000, start() }}
-                                source={{ uri: content[current].image }}
+                                source={{ uri: content[current].image, priority: FastImage.priority.high }}
                                 style={styles.image}
+                                resizeMode={FastImage.resizeMode.contain}
                             />
                             :
                             <Video onLoad={(data) => { props.duration = data.duration * 1000 }} onReadyForDisplay={() => start()}
