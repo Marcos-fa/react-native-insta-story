@@ -12,7 +12,7 @@ class StoryCircleListView extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if ((this.props?.data?.length !== prevProps?.data?.length) && this.props?.data?.length > 0) {
+        if (this.props?.data?.length > prevProps?.data?.length) {
             this.props.data.forEach(({username, stories}) => {
                 
                 if (this.state.catchedProfiles.indexOf(username) !== -1) {
