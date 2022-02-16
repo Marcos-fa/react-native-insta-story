@@ -96,10 +96,11 @@ class StoryCircleListItem extends Component {
               borderRadius: 100,
               borderWidth: 3,
               borderColor: "#121212",
+              display: !this.state.imageLoaded ? 'none' : 'flex'
             }}
             source={{
               uri: item.profile_pic_url,
-              priority: FastImage.priority.high,
+              priority: FastImage.priority.low,
             }}
             resizeMode={FastImage.resizeMode.contain}
             onLoadEnd={this.handleImgLoaded}
