@@ -140,7 +140,7 @@ export const Story = (props: Props) => {
                hidden={Platform.OS == 'ios' && isModalOpen? true : false}
                backgroundColor={colors.backGroundColor}
                barStyle={'light-content'}
-               showHideTransition={true}
+               showHideTransition={'fade'}
             />
             <View style={style}>
                 <StoryCircleListView
