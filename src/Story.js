@@ -1,4 +1,4 @@
-import React, {Fragment, useRef, useState} from "react";
+import React, {Fragment, useRef, useState, useContext} from "react";
 import {LogBox, Dimensions, View, Platform, StatusBar} from "react-native";
 import Modal from "react-native-modalbox";
 import StoryListItem from "./StoryListItem";
@@ -8,6 +8,8 @@ import type {IUserStory} from "./interfaces/IUserStory";
 import AndroidCubeEffect from "./AndroidCubeEffect";
 import CubeNavigationHorizontal from "./CubeNavigationHorizontal";
 import colors from "../../../styles/colors";
+import { MainContext } from "../../../context/main.context";
+import { ThemeContext } from "../../../context/theme.context";
 
 type Props = {
     data: IUserStory[],
@@ -39,7 +41,8 @@ export const Story = (props: Props) => {
         customCloseComponent,
         avatarSize
     } = props;
-
+    const {theme} = useContext(ThemeContext)
+	const { darkMode } = useContext(MainContext)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedData, setSelectedData] = useState([]);
@@ -138,8 +141,8 @@ export const Story = (props: Props) => {
                animated={true}
                translucent={true}
                hidden={Platform.OS == 'ios' && isModalOpen? true : false}
-               backgroundColor={colors.backGroundColor}
-               barStyle={'light-content'}
+               barStyle={darkMode? 'light-content' : 'dark-content'}
+               backgroundColor={theme.backgroundColor}
                showHideTransition={'fade'}
             />
             <View style={style}>

@@ -82,7 +82,7 @@ class StoryCircleListItem extends Component {
                 width: avatarSize ?? 60,
                 borderRadius: 100,
                 borderWidth: 3,
-                borderColor: "#121212",
+                borderColor: "transparent",
               }}
               source={DEFAULT_AVATAR}
               resizeMode={FastImage.resizeMode.contain}
@@ -95,7 +95,7 @@ class StoryCircleListItem extends Component {
               width: avatarSize ?? 60,
               borderRadius: 100,
               borderWidth: 3,
-              borderColor: "#121212",
+              borderColor: "transparent",
             }}
             source={{
               uri: item.profile_pic_url,
