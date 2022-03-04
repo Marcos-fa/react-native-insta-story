@@ -55,13 +55,13 @@ class StoryCircleListItem extends Component {
             },
             !isPressed
               ? {
-                  borderColor: unPressedBorderColor
-                    ? unPressedBorderColor
-                    : "red",
-                }
+                borderColor: unPressedBorderColor
+                  ? unPressedBorderColor
+                  : "red",
+              }
               : {
-                  borderColor: pressedBorderColor ? pressedBorderColor : "grey",
-                },
+                borderColor: pressedBorderColor ? pressedBorderColor : "grey",
+              },
           ]}
         >
           {/* <Image
@@ -78,11 +78,9 @@ class StoryCircleListItem extends Component {
           {!this.state.imageLoaded && (
             <FastImage
               style={{
-                height: avatarSize ?? 60,
-                width: avatarSize ?? 60,
+                height: avatarSize ?? 55,
+                width: avatarSize ?? 55,
                 borderRadius: 100,
-                borderWidth: 3,
-                borderColor: "transparent",
               }}
               source={DEFAULT_AVATAR}
               resizeMode={FastImage.resizeMode.contain}
@@ -91,11 +89,9 @@ class StoryCircleListItem extends Component {
 
           <FastImage
             style={{
-              height: avatarSize ?? 60,
-              width: avatarSize ?? 60,
+              height: avatarSize ?? 55,
+              width: avatarSize ?? 55,
               borderRadius: 100,
-              borderWidth: 3,
-              borderColor: "transparent",
             }}
             source={{
               uri: item.profile_pic_url,
