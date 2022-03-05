@@ -141,7 +141,7 @@ export const Story = (props: Props) => {
                animated={true}
                translucent={true}
                hidden={Platform.OS == 'ios' && isModalOpen? true : false}
-               barStyle={darkMode? 'light-content' : 'dark-content'}
+               barStyle={!darkMode? 'light-content' : 'dark-content'}
                backgroundColor={theme.backgroundColor}
                showHideTransition={'fade'}
             />
