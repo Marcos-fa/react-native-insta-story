@@ -41,8 +41,7 @@ export const Story = (props: Props) => {
         customCloseComponent,
         avatarSize
     } = props;
-    const {theme} = useContext(ThemeContext)
-	const { darkMode } = useContext(MainContext)
+    const {theme, darkMode} = useContext(ThemeContext)
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const [selectedData, setSelectedData] = useState([]);
