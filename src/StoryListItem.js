@@ -251,7 +251,6 @@ export const StoryListItem = (props: Props) => {
     }
 
     const saveStory = async (REMOTE_IMAGE_PATH) => {
-        console.log('SIMON SI LLEGA XDXDXDXD')
         let url = REMOTE_IMAGE_PATH;
         try {
             RNFetchBlob

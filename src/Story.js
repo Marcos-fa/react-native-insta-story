@@ -107,30 +107,32 @@ export const Story = (props: Props) => {
         let index = 0;
         let x, i;
         const histories2 = []
-        while(index < histories.length){
-            i = index;
-            x = selectedData[i];
-            index ++;
-            histories2.push(
-                <StoryListItem duration={duration * 1000}
-                               key={i}
-                               profileName={x.username}
-                               profileImage={x.profile_pic_url}
-                               stories={x.stories}
-                               currentPage={currentPage}
-                               onFinish={onStoryFinish}
-                               swipeText={swipeText}
-                               customSwipeUpComponent={customSwipeUpComponent}
-                               customCloseComponent={customCloseComponent}
-                               onClosePress={() => {
-                                   setIsModalOpen(false);
-                                   if (onClose) {
-                                       onClose(x);
-                                   }
-                               }}
-                               index={i}
-                />
-            )
+        if (histories) {
+            while(index < histories.length){
+                i = index;
+                x = selectedData[i];
+                index ++;
+                histories2.push(
+                    <StoryListItem duration={duration * 1000}
+                                key={i}
+                                profileName={x.username}
+                                profileImage={x.profile_pic_url}
+                                stories={x.stories}
+                                currentPage={currentPage}
+                                onFinish={onStoryFinish}
+                                swipeText={swipeText}
+                                customSwipeUpComponent={customSwipeUpComponent}
+                                customCloseComponent={customCloseComponent}
+                                onClosePress={() => {
+                                    setIsModalOpen(false);
+                                    if (onClose) {
+                                        onClose(x);
+                                    }
+                                }}
+                                index={i}
+                    />
+                )
+            }
         }
         return histories2
     }
@@ -158,7 +160,7 @@ export const Story = (props: Props) => {
                     }
                 }}
             >
-                {renderStoryList()}
+                {renderStoryList(selectedData)}
             </AndroidCubeEffect>)
         }
     }

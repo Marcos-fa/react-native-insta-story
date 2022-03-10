@@ -106,6 +106,9 @@ export default class AndroidCubeEffect extends React.Component {
                 ? this.pages[props.scrollLockPage]
                 : undefined,
         });
+
+        this.pages = props.children.map((child, index) => width * -index);
+        this.fullWidth = (props.children.length - 1) * width;
     }
 
     /*
