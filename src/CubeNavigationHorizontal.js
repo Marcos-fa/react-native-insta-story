@@ -19,7 +19,7 @@ export default class CubeNavigationHorizontal extends React.Component {
 
         this.pages = this.props.children.map((child, index) => width * -index);
         this.fullWidth = (this.props.children.length - 1) * width;
-
+        
         this.state = {
             currentPage: 0,
             scrollLockPage: this.pages[this.props.scrollLockPage]
@@ -98,6 +98,8 @@ export default class CubeNavigationHorizontal extends React.Component {
                 ? this.pages[props.scrollLockPage]
                 : undefined
         });
+        this.pages = props.children.map((child, index) => width * -index);
+        this.fullWidth = (props.children.length - 1) * width;
     }
 
     /*
