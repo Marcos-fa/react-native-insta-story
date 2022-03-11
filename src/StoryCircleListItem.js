@@ -30,9 +30,6 @@ class StoryCircleListItem extends Component {
     // this.setState({ isPressed: true }); //Function to check as watched.
   };
 
-  handleImgLoaded = () => this.setState({ imageLoaded: true });
-
-
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevProps.item.seen != this.props.item.seen) {
       this.setState({ isPressed: this.props.item.seen });
@@ -81,6 +78,7 @@ class StoryCircleListItem extends Component {
                 height: avatarSize ?? 55,
                 width: avatarSize ?? 55,
                 borderRadius: 100,
+                position: 'absolute'
               }}
               source={DEFAULT_AVATAR}
               resizeMode={FastImage.resizeMode.contain}
@@ -98,7 +96,7 @@ class StoryCircleListItem extends Component {
               priority: FastImage.priority.high,
             }}
             resizeMode={FastImage.resizeMode.contain}
-            onLoadEnd={this.handleImgLoaded}
+            onLoadEnd={() => this.setState({ imageLoaded: true })}
           />
         </TouchableOpacity>
       </View>
