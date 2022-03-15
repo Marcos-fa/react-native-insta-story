@@ -38,8 +38,8 @@ const { width, height } = Dimensions.get('window');
 
 
 type Props = {
-    profileName: string,
-    profileImage: string,
+    username: string,
+    profile_pic_url: string,
     duration?: number,
     onFinish?: function,
     onClosePress: function,
@@ -338,9 +338,9 @@ export const StoryListItem = (props: Props) => {
                         <View style={styles.userContainer}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <FastImage style={styles.avatarImage}
-                                    source={{ uri: props.profileImage }}
+                                    source={{ uri: props.profile_pic_url }}
                                 />
-                                <Text style={styles.avatarText}>{props.profileName}</Text>
+                                <Text style={styles.avatarText}>{props.username}</Text>
                             </View>
                             {/*
                             <View style={styles.storyOptions} >

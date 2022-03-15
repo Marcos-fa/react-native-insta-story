@@ -1,14 +1,14 @@
-import React, {Fragment, useRef, useState, useContext, useEffect} from "react";
-import {LogBox, Dimensions, View, Platform, StatusBar} from "react-native";
+import React, { Fragment, useRef, useState, useContext, useEffect } from "react";
+import { LogBox, Dimensions, View, Platform, StatusBar } from "react-native";
 import Modal from "react-native-modalbox";
 import StoryListItem from "./StoryListItem";
 import StoryCircleListView from "./StoryCircleListView";
-import {isNullOrWhitespace} from "./helpers/ValidationHelpers";
-import type {IUserStory} from "./interfaces/IUserStory";
+import { isNullOrWhitespace } from "./helpers/ValidationHelpers";
+import type { IUserStory } from "./interfaces/IUserStory";
 import AndroidCubeEffect from "./AndroidCubeEffect";
 import CubeNavigationHorizontal from "./CubeNavigationHorizontal";
 import { ThemeContext } from "../../../context/theme.context";
-import {getLimit, increaseLimit} from '../../../src/api/stories';
+import { getLimit, increaseLimit } from '../../../src/api/stories';
 import { BackContext } from "../../../context/back.context";
 
 type Props = {
@@ -28,7 +28,7 @@ type Props = {
 LogBox.ignoreLogs(['Warning: componentWillReceiveProps']); // Ignore log notification by message
 
 export const Story = (props: Props) => {
-    const {stories} = useContext(BackContext);
+    const { stories } = useContext(BackContext);
     const {
         data,
         unPressedBorderColor,
@@ -42,11 +42,12 @@ export const Story = (props: Props) => {
         customCloseComponent,
         avatarSize
     } = props;
-    const {theme, darkMode} = useContext(ThemeContext)
+    const { theme, darkMode } = useContext(ThemeContext)
     let [isModalOpen, setIsModalOpen] = useState(false);
     let [currentPage, setCurrentPage] = useState(0);
     let [indexPage, setIndexPage] = useState(0);
     let [selectedData, setSelectedData] = useState([]);
+    let startIndex;
     const cube = useRef();
 
     // Component Functions
@@ -57,19 +58,20 @@ export const Story = (props: Props) => {
         }
         setCurrentPage(0);
         setIndexPage(index);
+        startIndex = index;
         setSelectedData(newData);
         setIsModalOpen(true);
     };
 
-    useEffect(()=>{
-        if (stories.length  && indexPage >= (stories.length - 4) && getLimit() === stories.length) {
+    useEffect(() => {
+        if (stories.length && indexPage >= (stories.length - 4) && getLimit() === stories.length) {
             increaseLimit();
         }
-    },[indexPage]);
+    }, [indexPage]);
 
-    useEffect(()=>{
-        if(stories?.length){
-            const newData = stories.slice(currentPage);
+    useEffect(() => {
+        if (stories?.length) {
+            const newData = stories.slice(startIndex);
             setSelectedData(newData);
         }
     }, [stories]);
@@ -81,6 +83,7 @@ export const Story = (props: Props) => {
                 if (newPage < selectedData.length) {
                     setCurrentPage(newPage);
                     setIndexPage(indexPage + 1);
+                    console.log('new index: ', indexPage + '  ', stories[indexPage].username, + ' ' + stories[currentPage].username + ' ' + currentPage)
                     cube?.current?.scrollTo(newPage);
                 } else {
                     setIsModalOpen(false);
@@ -108,28 +111,28 @@ export const Story = (props: Props) => {
         let x, i;
         const histories2 = []
         if (histories) {
-            while(index < histories.length){
+            while (index < histories.length) {
                 i = index;
                 x = selectedData[i];
-                index ++;
+                index++;
                 histories2.push(
                     <StoryListItem duration={duration * 1000}
-                                key={i}
-                                profileName={x.username}
-                                profileImage={x.profile_pic_url}
-                                stories={x.stories}
-                                currentPage={currentPage}
-                                onFinish={onStoryFinish}
-                                swipeText={swipeText}
-                                customSwipeUpComponent={customSwipeUpComponent}
-                                customCloseComponent={customCloseComponent}
-                                onClosePress={() => {
-                                    setIsModalOpen(false);
-                                    if (onClose) {
-                                        onClose(x);
-                                    }
-                                }}
-                                index={i}
+                        key={i}
+                        username={x.username}
+                        profile_pic_url={x.profile_pic_url}
+                        stories={x.stories}
+                        currentPage={currentPage}
+                        onFinish={onStoryFinish}
+                        swipeText={swipeText}
+                        customSwipeUpComponent={customSwipeUpComponent}
+                        customCloseComponent={customCloseComponent}
+                        onClosePress={() => {
+                            setIsModalOpen(false);
+                            if (onClose) {
+                                onClose(x);
+                            }
+                        }}
+                        index={i}
                     />
                 )
             }
@@ -170,8 +173,8 @@ export const Story = (props: Props) => {
             <StatusBar
                 animated={true}
                 translucent={true}
-                hidden={Platform.OS == 'ios' && isModalOpen? true : false}
-                barStyle={darkMode? 'light-content' : 'dark-content'}
+                hidden={Platform.OS == 'ios' && isModalOpen ? true : false}
+                barStyle={darkMode ? 'light-content' : 'dark-content'}
                 backgroundColor={theme.backgroundColor}
                 showHideTransition={'fade'}
             />
