@@ -33,6 +33,7 @@ import CameraRoll from "@react-native-community/cameraroll";
 import RNFetchBlob from 'rn-fetch-blob'
 import Video from 'react-native-video';
 import { conditionalExpression } from '@babel/types';
+import { openIG } from '../../../screens/home.screen';
 
 const { width, height } = Dimensions.get('window');
 
@@ -336,12 +337,12 @@ export const StoryListItem = (props: Props) => {
                     </View>
                     <View style={styles.userSection}>
                         <View style={styles.userContainer}>
-                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => openIG(props.username)} style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <FastImage style={styles.avatarImage}
                                     source={{ uri: props.profile_pic_url }}
                                 />
                                 <Text style={styles.avatarText}>{props.username}</Text>
-                            </View>
+                            </TouchableOpacity>
                             {/*
                             <View style={styles.storyOptions} >
                                 <TouchableOpacity disabled={downShare > 0} onPress={() => !isPremium ? setPremiumVisible(true) : saveToCameraRoll(content[current].image)} style={[styles.downloadSvg, { opacity: downShare > 0 ? 0.5 : 1 }]}
