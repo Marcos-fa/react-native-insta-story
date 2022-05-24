@@ -33,14 +33,14 @@ import CameraRoll from "@react-native-community/cameraroll";
 import RNFetchBlob from 'rn-fetch-blob'
 import Video from 'react-native-video';
 import { conditionalExpression } from '@babel/types';
-import { openIG } from '../../../screens/home.screen';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const { width, height } = Dimensions.get('window');
 
 
 type Props = {
-    username: string,
-    profile_pic_url: string,
+    profileName: string,
+    profileImage: string,
     duration?: number,
     onFinish?: function,
     onClosePress: function,
@@ -93,68 +93,96 @@ export const StoryListItem = (props: Props) => {
     })
 
     useEffect(() => {
-        setCurrent(0);
-        if (props.currentPage != 0) {
-            let data = [...content];
-            data.map((x, i) => {
-                x.finish = 0;
-            })
-            setContent(data)
+        try {
+            setCurrent(0);
+            if (props.currentPage != 0) {
+                let data = [...content];
+                data.map((x, i) => {
+                    x.finish = 0;
+                })
+                setContent(data)
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory useEffect props.currentPage');
         }
     }, [props.currentPage]);
 
     continueStory = (value) => {
-        if (value) {
-            startAnimation();
-            setPressed(false);
-        } else {
-            progress.stopAnimation();
-            setPressed(true);
+        try {
+            if (value) {
+                startAnimation();
+                setPressed(false);
+            } else {
+                progress.stopAnimation();
+                setPressed(true);
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory continueStory');
         }
     }
 
     const prevCurrent = usePrevious(current);
 
     useEffect(() => {
-        if (!isNullOrWhitespace(prevCurrent)) {
-            if (current > prevCurrent && content[current - 1].image == content[current].image) {
-                start();
-            } else if (current < prevCurrent && content[current + 1].image == content[current].image) {
-                start();
+        try {
+            if (!isNullOrWhitespace(prevCurrent)) {
+                if (current > prevCurrent && content[current - 1].image == content[current].image) {
+                    start();
+                } else if (current < prevCurrent && content[current + 1].image == content[current].image) {
+                    start();
+                }
             }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory useEffect, current, StoryListItem');
         }
 
     }, [current]);
 
     function start() {
-        setLoad(false);
-        progress.setValue(0);
-        startAnimation();
+        try {
+            setLoad(false);
+            progress.setValue(0);
+            startAnimation();
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory start()');
+        }
     }
 
     function startAnimation() {
-        Animated.timing(progress, {
-            toValue: 1,
-            duration: props.duration,
-            useNativeDriver: false
-        }).start(({ finished }) => {
-            if (finished) {
-                next();
-            }
-        });
+        try {
+            Animated.timing(progress, {
+                toValue: 1,
+                duration: props.duration,
+                useNativeDriver: false
+            }).start(({ finished }) => {
+                if (finished) {
+                    next();
+                }
+            });
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory startAnimation()');
+        }
     }
 
     function onSwipeUp() {
-        if (props.onClosePress) {
-            props.onClosePress();
-        }
-        if (content[current].onPress) {
-            content[current].onPress();
+        try {
+            if (props.onClosePress) {
+                props.onClosePress();
+            }
+            if (content[current].onPress) {
+                content[current].onPress();
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory onSwipeUp()');
         }
     }
 
     function onSwipeDown() {
-        props?.onClosePress();
+        try {
+            props?.onClosePress();
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory onSwipeDown()');
+        }
     }
 
     const config = {
@@ -163,67 +191,83 @@ export const StoryListItem = (props: Props) => {
     };
 
     function next() {
-        // check if the next content is not empty
-        setLoad(true);
-        if (current !== content.length - 1) {
-            let data = [...content];
-            data[current].finish = 1;
-            setContent(data);
-            setCurrent(current + 1);
-            progress.setValue(0);
-        } else {
-            // the next content is empty
-            close('next');
+        try {
+            // check if the next content is not empty
+            setLoad(true);
+            if (current !== content.length - 1) {
+                let data = [...content];
+                data[current].finish = 1;
+                setContent(data);
+                setCurrent(current + 1);
+                progress.setValue(0);
+            } else {
+                // the next content is empty
+                close('next');
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory next()');
         }
     }
 
     function previous() {
-        // checking if the previous content is not empty
-        setLoad(true);
-        if (current - 1 >= 0) {
-            let data = [...content];
-            data[current].finish = 0;
-            setContent(data);
-            setCurrent(current - 1);
-            progress.setValue(0);
-        } else {
-            // the previous content is empty
-            close('previous');
+        try {
+            // checking if the previous content is not empty
+            setLoad(true);
+            if (current - 1 >= 0) {
+                let data = [...content];
+                data[current].finish = 0;
+                setContent(data);
+                setCurrent(current - 1);
+                progress.setValue(0);
+            } else {
+                // the previous content is empty
+                close('previous');
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory previous()');
         }
     }
 
     function close(state) {
-        let data = [...content];
-        data.map(x => x.finish = 0);
-        setContent(data);
-        progress.setValue(0);
-        if (props.currentPage == props.index) {
-            if (props.onFinish) {
-                props.onFinish(state);
+        try {
+            let data = [...content];
+            data.map(x => x.finish = 0);
+            setContent(data);
+            progress.setValue(0);
+            if (props.currentPage == props.index) {
+                if (props.onFinish) {
+                    props.onFinish(state);
+                }
             }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory close()');
         }
     }
 
     const onShare = async (story_image) => {
-        setDownShare(2)
-        setLoad(false)
-        setPressed(true), progress.stopAnimation()
-        RNFetchBlob.config({
-            fileCache: true,
-            appendExt: content[current].media_type == 'IMAGE' || content[current].media_type === "IMAGEN" ? 'png' : 'mp4'
-        })
-            .fetch("GET", story_image, {})
-            .then(async (res) => {
-                await Share.share({
-                    url: 'file://' + res.path(),
-                    message: Platform.OS == 'ios' ? '' : story_image,
-                    type: content[current].media_type == 'IMAGE' || content[current].media_type === "IMAGEN" ? 'image/png' : 'video/mp4',
-                })
-                    // share.share(shareOptions)
-                    .then((res) => { setPressed(false), startAnimation() })
-                    .catch((err) => { setPressed(false), startAnimation() })
-                setDownShare(0)
-            });
+        try {
+            setDownShare(2)
+            setLoad(false)
+            setPressed(true), progress.stopAnimation()
+            RNFetchBlob.config({
+                fileCache: true,
+                appendExt: content[current].media_type == 'IMAGE' || content[current].media_type === "IMAGEN" ? 'png' : 'mp4'
+            })
+                .fetch("GET", story_image, {})
+                .then(async (res) => {
+                    await Share.share({
+                        url: 'file://' + res.path(),
+                        message: Platform.OS == 'ios' ? '' : story_image,
+                        type: content[current].media_type == 'IMAGE' || content[current].media_type === "IMAGEN" ? 'image/png' : 'video/mp4',
+                    })
+                        // share.share(shareOptions)
+                        .then((res) => { setPressed(false), startAnimation() })
+                        .catch((err) => { setPressed(false), startAnimation() })
+                    setDownShare(0)
+                });
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory onShare()');
+        }
     }
 
     const saveToCameraRoll = async (REMOTE_IMAGE_PATH) => {
@@ -244,6 +288,7 @@ export const StoryListItem = (props: Props) => {
                 }
             } else { saveStory(REMOTE_IMAGE_PATH) }
         } catch (error) {
+            crashlytics().recordError(error, 'error instaStory saveToCameraRoll()');
             console.log(error.message)
             setPressed(false);
             startAnimation();
@@ -276,6 +321,7 @@ export const StoryListItem = (props: Props) => {
                         })
                 })
         } catch (error) {
+            crashlytics().recordError(error, 'error instaStory saveStory()');
             console.log(error.message)
         }
     }
@@ -337,12 +383,12 @@ export const StoryListItem = (props: Props) => {
                     </View>
                     <View style={styles.userSection}>
                         <View style={styles.userContainer}>
-                            <TouchableOpacity onPress={() => openIG(props.username)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <FastImage style={styles.avatarImage}
-                                    source={{ uri: props.profile_pic_url }}
+                                    source={{ uri: props.profileImage }}
                                 />
-                                <Text style={styles.avatarText}>{props.username}</Text>
-                            </TouchableOpacity>
+                                <Text style={styles.avatarText}>{props.profileName}</Text>
+                            </View>
                             {/*
                             <View style={styles.storyOptions} >
                                 <TouchableOpacity disabled={downShare > 0} onPress={() => !isPremium ? setPremiumVisible(true) : saveToCameraRoll(content[current].image)} style={[styles.downloadSvg, { opacity: downShare > 0 ? 0.5 : 1 }]}

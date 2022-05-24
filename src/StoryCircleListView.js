@@ -1,8 +1,10 @@
-import React, {Component, useEffect} from "react";
-import {View, FlatList} from "react-native";
+import React, { Component, useEffect } from "react";
+import { View, FlatList } from "react-native";
 import FastImage from "react-native-fast-image";
 import StoryCircleListItem from "./StoryCircleListItem";
-import {getLimit, increaseLimit} from '../../../src/api/stories';
+import { getLimit, increaseLimit } from '../../../src/api/stories';
+import crashlytics from '@react-native-firebase/crashlytics';
+
 class StoryCircleListView extends Component {
     constructor(props) {
         super(props);
@@ -12,24 +14,28 @@ class StoryCircleListView extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props?.data?.length > prevProps?.data?.length) {
-            this.props.data.forEach(({username, stories}) => {
-                
-                if (this.state.catchedProfiles.indexOf(username) !== -1) {
-                    //Profile has been catched 
-                    
-                } else {
-                    //Profile has NOT been catched 
-                    FastImage.preload(stories.map(({story_image}) => {
-                        return {uri: story_image}
-                    }))
-                    this.setState({catchedProfiles: this.state.catchedProfiles.concat(username)})
-                }
-            })
+        try {
+            if (this.props?.data?.length > prevProps?.data?.length) {
+                this.props.data.forEach(({ username, stories }) => {
+
+                    if (this.state.catchedProfiles.indexOf(username) !== -1) {
+                        //Profile has been catched 
+
+                    } else {
+                        //Profile has NOT been catched 
+                        FastImage.preload(stories.map(({ story_image }) => {
+                            return { uri: story_image }
+                        }))
+                        this.setState({ catchedProfiles: this.state.catchedProfiles.concat(username) })
+                    }
+                })
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory componentDidUpdate(prevProps)');
         }
     }
 
-    
+
     render() {
         const {
             data,
@@ -42,17 +48,17 @@ class StoryCircleListView extends Component {
         return (
             <View>
                 <FlatList
-                    onEndReached={()=> data.length == getLimit() ? increaseLimit() : null}
+                    onEndReached={() => data.length == getLimit() ? increaseLimit() : null}
                     extraData={data}
                     keyExtractor={(item, index) => index.toString()}
                     progressViewOffset={9}
                     data={data}
                     horizontal
-                    style={{paddingLeft: 12}}
+                    style={{ paddingLeft: 12 }}
                     showsVerticalScrollIndicator={false}
                     showsHorizontalScrollIndicator={false}
-                    ListFooterComponent={<View style={{flex: 1, width: 8}}/>}
-                    renderItem={({item, index}) => (
+                    ListFooterComponent={<View style={{ flex: 1, width: 8 }} />}
+                    renderItem={({ item, index }) => (
                         <StoryCircleListItem
                             avatarSize={avatarSize}
                             handleStoryItemPress={() =>

@@ -7,6 +7,7 @@ import {
   Platform,
 } from "react-native";
 import FastImage from "react-native-fast-image";
+import crashlytics from '@react-native-firebase/crashlytics';
 
 // Constants
 import DEFAULT_AVATAR from "./assets/images/no_avatar.png";
@@ -23,16 +24,24 @@ class StoryCircleListItem extends Component {
 
   // Component Functions
   _handleItemPress = (item) => {
-    const { handleStoryItemPress } = this.props;
+    try {
+      const { handleStoryItemPress } = this.props;
 
-    if (handleStoryItemPress) handleStoryItemPress(item);
+      if (handleStoryItemPress) handleStoryItemPress(item);
 
-    // this.setState({ isPressed: true }); //Function to check as watched.
+      // this.setState({ isPressed: true }); //Function to check as watched.
+    } catch (error) {
+      crashlytics().recordError(error, 'error instaStory _handleItemPress = (item) StoryCircleListItem');
+    }
   };
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (prevProps.item.seen != this.props.item.seen) {
-      this.setState({ isPressed: this.props.item.seen });
+    try {
+      if (prevProps.item.seen != this.props.item.seen) {
+        this.setState({ isPressed: this.props.item.seen });
+      }
+    } catch (error) {
+      crashlytics().recordError(error, 'error instaStory componentDidUpdate(prevProps, prevState, snapshot) StoryCircleListItem');
     }
   }
 

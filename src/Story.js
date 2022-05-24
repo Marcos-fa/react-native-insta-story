@@ -10,6 +10,7 @@ import CubeNavigationHorizontal from "./CubeNavigationHorizontal";
 import { ThemeContext } from "../../../context/theme.context";
 import { getLimit, increaseLimit } from '../../../src/api/stories';
 import { BackContext } from "../../../context/back.context";
+import crashlytics from '@react-native-firebase/crashlytics';
 
 type Props = {
     data: IUserStory[],
@@ -47,103 +48,133 @@ export const Story = (props: Props) => {
     let [currentPage, setCurrentPage] = useState(0);
     let [indexPage, setIndexPage] = useState(0);
     let [selectedData, setSelectedData] = useState([]);
-    let startIndex;
     const cube = useRef();
 
     // Component Functions
     const _handleStoryItemPress = (item, index) => {
-        const newData = stories.slice(index);
-        if (onStart) {
-            onStart(item)
+        try {
+            const newData = stories.slice(index);
+            if (onStart) {
+                onStart(item)
+            }
+            setCurrentPage(0);
+            setIndexPage(index);
+            setSelectedData(newData);
+            setIsModalOpen(true);
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory _handleStoryItemPress');
         }
-        setCurrentPage(0);
-        setIndexPage(index);
-        startIndex = index;
-        setSelectedData(newData);
-        setIsModalOpen(true);
     };
 
     useEffect(() => {
-        if (stories.length && indexPage >= (stories.length - 4) && getLimit() === stories.length) {
-            increaseLimit();
+        try {
+            if (stories.length && indexPage >= (stories.length - 4) && getLimit() === stories.length) {
+                increaseLimit();
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory useEffect indexPage');
         }
     }, [indexPage]);
 
     useEffect(() => {
-        if (stories?.length) {
-            const newData = stories.slice(startIndex);
-            setSelectedData(newData);
+        try {
+            if (stories?.length) {
+                const newData = stories.slice(currentPage);
+                setSelectedData(newData);
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory useEffect stories');
         }
     }, [stories]);
 
     const onStoryFinish = (state) => {
-        if (!isNullOrWhitespace(state)) {
-            if (state == "next") {
-                const newPage = currentPage + 1;
-                if (newPage < selectedData.length) {
-                    setCurrentPage(newPage);
-                    setIndexPage(indexPage + 1);
-                    console.log('new index: ', indexPage + '  ', stories[indexPage].username, + ' ' + stories[currentPage].username + ' ' + currentPage)
-                    cube?.current?.scrollTo(newPage);
-                } else {
-                    setIsModalOpen(false);
-                    setCurrentPage(0);
-                    if (onClose) {
-                        onClose(selectedData[selectedData.length - 1]);
+        try {
+            if (!isNullOrWhitespace(state)) {
+                if (state == "next") {
+                    const newPage = currentPage + 1;
+                    if (newPage < selectedData.length) {
+                        setCurrentPage(newPage);
+                        setIndexPage(indexPage + 1);
+                        cube?.current?.scrollTo(newPage);
+                    } else {
+                        setIsModalOpen(false);
+                        setCurrentPage(0);
+                        if (onClose) {
+                            onClose(selectedData[selectedData.length - 1]);
+                        }
+                    }
+                } else if (state == "previous") {
+                    const newPage = currentPage - 1;
+                    if (newPage < 0) {
+                        setIsModalOpen(false);
+                        setCurrentPage(0);
+                    } else {
+                        setIndexPage(indexPage - 1);
+                        setCurrentPage(newPage);
+                        cube?.current?.scrollTo(newPage);
                     }
                 }
-            } else if (state == "previous") {
-                const newPage = currentPage - 1;
-                if (newPage < 0) {
-                    setIsModalOpen(false);
-                    setCurrentPage(0);
-                } else {
-                    setIndexPage(indexPage - 1);
-                    setCurrentPage(newPage);
-                    cube?.current?.scrollTo(newPage);
-                }
             }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory onStoryFinish');
         }
     }
 
     const renderStoryList = (histories) => {
-        let index = 0;
-        let x, i;
-        const histories2 = []
-        if (histories) {
-            while (index < histories.length) {
-                i = index;
-                x = selectedData[i];
-                index++;
-                histories2.push(
-                    <StoryListItem duration={duration * 1000}
-                        key={i}
-                        username={x.username}
-                        profile_pic_url={x.profile_pic_url}
-                        stories={x.stories}
-                        currentPage={currentPage}
-                        onFinish={onStoryFinish}
-                        swipeText={swipeText}
-                        customSwipeUpComponent={customSwipeUpComponent}
-                        customCloseComponent={customCloseComponent}
-                        onClosePress={() => {
-                            setIsModalOpen(false);
-                            if (onClose) {
-                                onClose(x);
-                            }
-                        }}
-                        index={i}
-                    />
-                )
+        try {
+            let index = 0;
+            let x, i;
+            const histories2 = []
+            if (histories) {
+                while (index < histories.length) {
+                    i = index;
+                    x = selectedData[i];
+                    index++;
+                    histories2.push(
+                        <StoryListItem duration={duration * 1000}
+                            key={i}
+                            profileName={x.username}
+                            profileImage={x.profile_pic_url}
+                            stories={x.stories}
+                            currentPage={currentPage}
+                            onFinish={onStoryFinish}
+                            swipeText={swipeText}
+                            customSwipeUpComponent={customSwipeUpComponent}
+                            customCloseComponent={customCloseComponent}
+                            onClosePress={() => {
+                                setIsModalOpen(false);
+                                if (onClose) {
+                                    onClose(x);
+                                }
+                            }}
+                            index={i}
+                        />
+                    )
+                }
             }
+            return histories2
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory renderStoryList');
         }
-        return histories2
     }
 
     const renderCube = () => {
-        if (Platform.OS == 'ios') {
-            return (
-                <CubeNavigationHorizontal
+        try {
+            if (Platform.OS == 'ios') {
+                return (
+                    <CubeNavigationHorizontal
+                        ref={cube}
+                        callBackAfterSwipe={(x) => {
+                            if (x != currentPage) {
+                                setCurrentPage(parseInt(x));
+                            }
+                        }}
+                    >
+                        {renderStoryList(selectedData)}
+                    </CubeNavigationHorizontal>
+                )
+            } else {
+                return (<AndroidCubeEffect
                     ref={cube}
                     callBackAfterSwipe={(x) => {
                         if (x != currentPage) {
@@ -152,19 +183,10 @@ export const Story = (props: Props) => {
                     }}
                 >
                     {renderStoryList(selectedData)}
-                </CubeNavigationHorizontal>
-            )
-        } else {
-            return (<AndroidCubeEffect
-                ref={cube}
-                callBackAfterSwipe={(x) => {
-                    if (x != currentPage) {
-                        setCurrentPage(parseInt(x));
-                    }
-                }}
-            >
-                {renderStoryList(selectedData)}
-            </AndroidCubeEffect>)
+                </AndroidCubeEffect>)
+            }
+        } catch (error) {
+            crashlytics().recordError(error, 'error instaStory renderCube');
         }
     }
 
